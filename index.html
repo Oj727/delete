@@ -55,7 +55,7 @@
       selectedCells.length = 0; // リセット
       document.getElementById("sheetData").textContent = "Loading...";
 
-      fetch("https://script.google.com/macros/s/AKfycbzSSJZCS48jhkcpViQz0YmcKPA8sko6utqAHtGuk1uh9zaw-2CVF3qhdb1j-FckMJm2/exec")
+      fetch("https://script.google.com/macros/s/AKfycbwr1Fc8MQkOkHVlhfkqUHhb7_wqawyGo_58f0omRJw7GEkSBVrmFei1DTy5SxxiqQc1zA/exec")
         .then(res => res.json())
         .then(data => {
           const table = document.createElement("table");
