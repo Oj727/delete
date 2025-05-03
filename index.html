@@ -145,9 +145,11 @@
           });
 
           alert("削除が完了しました。");
+          // 予約完了後に指定のURLに遷移
+          window.location.href = "https://oj727.github.io/test/";
 
           // 🔄 表を再読み込みして更新を反映
-          loadSheet();
+          //loadSheet();
         }
       } else {
         alert("予約したい時間を選択してください。");
