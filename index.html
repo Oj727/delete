@@ -78,25 +78,8 @@
                   const button = document.createElement("button");
                   button.textContent = "○";
 
-                  button.addEventListener("click", () => {
-                    const isSelected = cellElement.classList.toggle("selected");
-
-                    if (isSelected) {
-                      button.textContent = "✓";
-                      selectedCells.push({
-                        date: data[0][colIndex],
-                        time: data[rowIndex][0],
-                        cell: cellElement,
-                        button: button,
-                        rowIndex: rowIndex,           
-                        colIndex: colIndex  
-                      });
-                    } else {
-                      button.textContent = "○";
-                      const index = selectedCells.findIndex(item => item.cell === cellElement);
-                      if (index !== -1) selectedCells.splice(index, 1);
-                    }
-                  });
+                  // 「○」ボタンが押せないようにするため、ボタンにdisabled属性を追加
+                  button.disabled = true;
 
                   cellElement.appendChild(button);
                   cellElement.style.backgroundColor = "#ccffcc"; // 黄緑
@@ -104,8 +87,27 @@
                   cellElement.textContent = cell;
                   cellElement.style.backgroundColor = "#ddd"; // 灰色
                 } else {
+                  // 「○」でも「×」でもないセル
                   cellElement.textContent = cell;
                   cellElement.style.backgroundColor = "#ffcccc"; // 赤
+
+                  // クリックで選択できるようにする
+                  cellElement.addEventListener("click", () => {
+                    const isSelected = cellElement.classList.toggle("selected");
+
+                    if (isSelected) {
+                      selectedCells.push({
+                        date: data[0][colIndex],
+                        time: data[rowIndex][0],
+                        cell: cellElement,
+                        rowIndex: rowIndex,
+                        colIndex: colIndex
+                      });
+                    } else {
+                      const index = selectedCells.findIndex(item => item.cell === cellElement);
+                      if (index !== -1) selectedCells.splice(index, 1);
+                    }
+                  });
                 }
               } else {
                 cellElement.textContent = cell;
