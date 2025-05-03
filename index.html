@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEM予約管理</title>
+  <style>
+    table { border-collapse: collapse; }
+    td, th {
+      border: 1px solid #aaa;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    button {
+      padding: 4px 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .selected {
+      background-color: #99ccff !important; /* 青色 */
+    }
+  </style>
+</head>
+<body>
+  <h1>SEM予約表</h1>
+  <div style="width:590px; height:300px; overflow:hidden;">
+    <img src="https://www.em.eng.chiba-u.jp/~itoi/equipment/24.jpg"
+         alt="SEM画像"
+         style="width:100%; height:100%; object-fit: cover; object-position: center;border-radius: 16px;">
+  </div>
+
+  <p>みんなで仲良くSEMを利用しよう!!</p>
+  <p>予約したい場所をクリックしてください。</p>
+
+  <div id="sheetData">Loading...</div>
+
+  <button id="reserveBtn" style="
+    margin-top: 50px;
+    padding: 16px 32px;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: 0.3s;
+  ">
+    予約
+  </button>
+
+  <script>
+    const selectedCells = []; // 選択されたセル情報を複数保存
+
+    function loadSheet() {
+      selectedCells.length = 0; // リセット
+      document.getElementById("sheetData").textContent = "Loading...";
+
+      fetch("https://script.google.com/macros/s/AKfycbzSSJZCS48jhkcpViQz0YmcKPA8sko6utqAHtGuk1uh9zaw-2CVF3qhdb1j-FckMJm2/exec")
+        .then(res => res.json())
+        .then(data => {
+          const table = document.createElement("table");
+
+          data.forEach((row, rowIndex) => {
+            const tr = document.createElement("tr");
+
+            row.forEach((cell, colIndex) => {
+              const isHeader = rowIndex === 0 || colIndex === 0;
+              const cellElement = document.createElement(isHeader ? "th" : "td");
+
+              if (!isHeader) {
+                if (cell === "") {
+                  const button = document.createElement("button");
+                  button.textContent = "○";
+
+                  button.addEventListener("click", () => {
+                    const isSelected = cellElement.classList.toggle("selected");
+
+                    if (isSelected) {
+                      button.textContent = "✓";
+                      selectedCells.push({
+                        date: data[0][colIndex],
+                        time: data[rowIndex][0],
+                        cell: cellElement,
+                        button: button,
+                        rowIndex: rowIndex,           
+                        colIndex: colIndex  
+                      });
+                    } else {
+                      button.textContent = "○";
+                      const index = selectedCells.findIndex(item => item.cell === cellElement);
+                      if (index !== -1) selectedCells.splice(index, 1);
+                    }
+                  });
+
+                  cellElement.appendChild(button);
+                  cellElement.style.backgroundColor = "#ccffcc"; // 黄緑
+                } else if (cell === "×") {
+                  cellElement.textContent = cell;
+                  cellElement.style.backgroundColor = "#ddd"; // 灰色
+                } else {
+                  cellElement.textContent = cell;
+                  cellElement.style.backgroundColor = "#ffcccc"; // 赤
+                }
+              } else {
+                cellElement.textContent = cell;
+              }
+
+              tr.appendChild(cellElement);
+            });
+
+            table.appendChild(tr);
+          });
+
+          document.getElementById("sheetData").innerHTML = "";
+          document.getElementById("sheetData").appendChild(table);
+        })
+        .catch(err => {
+          document.getElementById("sheetData").textContent = "エラー：" + err;
+        });
+    }
+
+    // 初期読み込み
+    window.addEventListener("DOMContentLoaded", loadSheet);
+
+    // 予約ボタン処理
+    document.getElementById("reserveBtn").addEventListener("click", () => {
+      const name = "太郎";  // 名前は一律「太郎」
+      
+      if (selectedCells.length > 0) {
+        const message = selectedCells.map(item => {
+          return `${item.date} ${item.time}`;
+        }).join('\n');
+
+        // 名前も含めた予約確認メッセージ
+        if (confirm(`以下の時間で予約しますか？\n\n名前: ${name}\n\n${message}\n\n※予約時間は表示されている時間から30min\n※更新して正しく予約できてるか確認してください。`)) {
+          selectedCells.forEach(item => {
+            sendData(name, item.rowIndex, item.colIndex);
+          });
+
+          alert("予約が完了しました。");
+
+          // 🔄 表を再読み込みして更新を反映
+          loadSheet();
+        }
+      } else {
+        alert("予約したい時間を選択してください。");
+      }
+    });
+
+    function sendData(inputText, row, col) {
+      var url = 'https://script.google.com/macros/s/AKfycbyp90PE1fdXlCea2I2TcheUXAcEHwFA_yI8o031IMyjRMH2mxrNk-YVVZf889fPXoBvoQ/exec';
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'inputText=' + encodeURIComponent(inputText) + 
+              '&row=' + encodeURIComponent(row) + 
+              '&col=' + encodeURIComponent(col)
+      })
+      .then(response => response.text())
+      .then(data => {
+        // 成功時の処理はここでもできる
+      })
+      .catch(error => {
+        alert('エラーが発生しました: ' + error);
+      });
+    }
+  </script>
+</body>
+</html>
