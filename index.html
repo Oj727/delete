@@ -33,8 +33,7 @@
          style="width:100%; height:100%; object-fit: cover; object-position: center;border-radius: 16px;">
   </div>
 
-  <p>みんなで仲良くSEMを利用しよう!!</p>
-  <p>予約したい場所をクリックしてください。</p>
+  <p>削除したい日時を選択してください。</p>
 
   <div id="sheetData">Loading...</div>
 
@@ -51,7 +50,7 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     transition: 0.3s;
   ">
-    予約
+    削除
   </button>
 
   <script>
@@ -132,7 +131,7 @@
 
     // 予約ボタン処理
     document.getElementById("reserveBtn").addEventListener("click", () => {
-      const name = "太郎";  // 名前は一律「太郎」
+      const name = "";  // 名前は一律「太郎」
       
       if (selectedCells.length > 0) {
         const message = selectedCells.map(item => {
@@ -140,12 +139,12 @@
         }).join('\n');
 
         // 名前も含めた予約確認メッセージ
-        if (confirm(`以下の時間で予約しますか？\n\n名前: ${name}\n\n${message}\n\n※予約時間は表示されている時間から30min\n※更新して正しく予約できてるか確認してください。`)) {
+        if (confirm(`以下の日時の予約を削除しますか？\n${message}\n\n※更新して正しく削除できてるか確認してください。`)) {
           selectedCells.forEach(item => {
             sendData(name, item.rowIndex, item.colIndex);
           });
 
-          alert("予約が完了しました。");
+          alert("削除が完了しました。");
 
           // 🔄 表を再読み込みして更新を反映
           loadSheet();
